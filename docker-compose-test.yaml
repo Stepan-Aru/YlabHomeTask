@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  test-app:
+    build: .
+    environment:
+      DB_USER: "postgres"
+      DB_PASSWORD: "password"
+      DB_URL: "postgres"
+      DB_NAME: "resto"
+    command: "pytest -vv"
+    networks:
+      - test_resto_network
+
+networks:
+  test_resto_network:
+    external:
+      name: resto_network

@@ -1,9 +1,9 @@
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import Session
 
-from database import Menu, Submenu, Dish
+from app.database import Menu, Submenu, Dish
 
-from models import (
+from app.models import (
     MenuModel,
     SubmenuModel,
     DishModel,

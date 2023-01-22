@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Response
 
-from database import SessionLocal
-from routes import router
+from app.database import SessionLocal
+from app.routes import router
 
 app = FastAPI()
 

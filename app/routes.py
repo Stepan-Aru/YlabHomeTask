@@ -2,9 +2,9 @@ from fastapi import APIRouter, status, HTTPException, Depends, Request
 
 from sqlalchemy.orm import Session
 
-from database import create_tables
+from app.database import create_tables
 
-from crud import (
+from app.crud import (
     create_menu,
     create_submenu,
     create_dish,
@@ -21,7 +21,7 @@ from crud import (
     delete_submenu,
     delete_dish,
 )
-from models import (
+from app.models import (
     MenuModel,
     SubmenuModel,
     DishModel,
