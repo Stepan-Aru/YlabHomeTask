@@ -2,11 +2,7 @@ version: '3.8'
 services:
   test-app:
     build: .
-    environment:
-      DB_USER: "postgres"
-      DB_PASSWORD: "password"
-      DB_URL: "postgres"
-      DB_NAME: "resto"
+    env_file: .env.example
     command: "pytest -vv"
     networks:
       - test_resto_network
