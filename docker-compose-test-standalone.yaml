@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  test-app:
+    build: .
+    env_file: .env.example
+    command: "pytest -vv"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - test_resto_network
+
+  postgres:
+    image: postgres:15.1-alpine
+    restart: always
+    env_file: .env.example
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test_resto_network
+
+networks:
+  test_resto_network:
+    name: test_resto_network
