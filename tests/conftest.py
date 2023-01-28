@@ -1,4 +1,6 @@
+import asyncio
 import os
+from typing import Generator
 
 import psycopg2
 import pytest
@@ -9,7 +11,7 @@ from sqlalchemy.orm import sessionmaker, session
 
 from app.database import Base
 from app.main import app
-from app.routes import get_db
+from app.services import get_db
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
@@ -59,6 +61,13 @@ def create_test_session_local():
 
     app.dependency_overrides[get_db] = override_get_db
     Base.metadata.create_all(bind=test_engine)
+
+
+@pytest.fixture(scope="session")
+def event_loop(request) -> Generator:
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="module", autouse=True)
