@@ -28,10 +28,10 @@ docker-compose -f docker-compose-test.yaml up
 * PosgresSQL
 * SQLAlchemy
 * Psycopgy2
+* Redis
 * Docker, docker-compose
 
 ### План развития проекта:
 
 * Внедрить миграции БД (alembic)
 * Перейти на асинхронный драйвер БД
-* Добавить кэширование

@@ -46,7 +46,7 @@ def kill_all_connections():
     execute_db(
         f'SELECT pg_terminate_backend(pg_stat_activity.pid)\n'
         f'FROM pg_stat_activity\n'
-        f'WHERE pg_stat_activity.datname = "test_{DB_NAME}"\n'
+        f'WHERE pg_stat_activity.datname = \'test_{DB_NAME}\'\n'
         f'AND pid <> pg_backend_pid();',
     )
 
