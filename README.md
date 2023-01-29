@@ -12,11 +12,11 @@ docker-compose up
 
 С отдельным контейнером с СУБД:
 ```sh
-docker-compose -f docker-compose-test-standalone.yaml up 
+docker-compose -f docker-compose-test-standalone.yaml up
 ```
 С использованием основного контейнера с СУБД (в нем создается тестовая БД, которая удаляется после тестов):
 ```sh
-docker-compose -f docker-compose-test.yaml up 
+docker-compose -f docker-compose-test.yaml up
 ```
 
 ### Описание:

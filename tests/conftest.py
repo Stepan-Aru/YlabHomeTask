@@ -21,7 +21,9 @@ DB_NAME = os.environ.get('DB_NAME')
 
 def execute_db(command: str):
     try:
-        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_URL)
+        conn = psycopg2.connect(
+            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_URL,
+        )
         cursor = conn.cursor()
         conn.autocommit = True
         cursor.execute(command)
@@ -33,24 +35,28 @@ def execute_db(command: str):
 
 
 def create_test_db():
-    execute_db(f"CREATE DATABASE test_{DB_NAME};")
+    execute_db(f'CREATE DATABASE test_{DB_NAME};')
 
 
 def drop_test_db():
-    execute_db(f"DROP DATABASE IF EXISTS test_{DB_NAME};")
+    execute_db(f'DROP DATABASE IF EXISTS test_{DB_NAME};')
 
 
 def kill_all_connections():
-    execute_db(f"SELECT pg_terminate_backend(pg_stat_activity.pid)\n"
-               f"FROM pg_stat_activity\n"
-               f"WHERE pg_stat_activity.datname = 'test_{DB_NAME}'\n"
-               f"AND pid <> pg_backend_pid();")
+    execute_db(
+        f'SELECT pg_terminate_backend(pg_stat_activity.pid)\n'
+        f'FROM pg_stat_activity\n'
+        f'WHERE pg_stat_activity.datname = "test_{DB_NAME}"\n'
+        f'AND pid <> pg_backend_pid();',
+    )
 
 
 def create_test_session_local():
-    TEST_DB_CONFIG = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_URL}/test_{DB_NAME}"
+    TEST_DB_CONFIG = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_URL}/test_{DB_NAME}'
     test_engine = create_engine(TEST_DB_CONFIG)
-    TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+    TestSessionLocal = sessionmaker(
+        autocommit=False, autoflush=False, bind=test_engine,
+    )
 
     def override_get_db():
         try:
@@ -63,14 +69,14 @@ def create_test_session_local():
     Base.metadata.create_all(bind=test_engine)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def event_loop(request) -> Generator:
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope='module', autouse=True)
 def create_drop_database():
     create_test_db()
     create_test_session_local()
@@ -82,5 +88,5 @@ def create_drop_database():
 
 @pytest_asyncio.fixture
 async def async_client() -> AsyncClient:
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(app=app, base_url='http://test') as ac:
         yield ac

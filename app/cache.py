@@ -5,7 +5,9 @@ from json import dumps, loads
 from fastapi.encoders import jsonable_encoder
 
 REDIS_URL = os.environ.get('REDIS_URL')
-redis = aioredis.from_url(url=REDIS_URL, encoding='utf-8', decode_responses=True)
+redis = aioredis.from_url(
+    url=REDIS_URL, encoding='utf-8', decode_responses=True,
+)
 
 REDIS_CACHE_TIME = 300
 

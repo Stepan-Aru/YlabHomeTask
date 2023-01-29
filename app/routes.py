@@ -31,193 +31,256 @@ async def startup():
 
 
 @router.post(
-    '/menus',
+    path='/menus',
+    tags=['Menu'],
+    summary='Create menu',
+    description='Create menu with title and description',
+    response_description='Created menu',
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseMenuModel
+    response_model=ResponseMenuModel,
 )
 async def create_menu_handler(
         menu: MenuModel,
-        menu_service: MenuService = Depends(get_menu_service)
+        menu_service: MenuService = Depends(get_menu_service),
 ) -> ResponseMenuModel:
     return await menu_service.create_menu(menu=menu)
 
 
 @router.post(
-    '/menus/{menu_id}/submenus',
+    path='/menus/{menu_id}/submenus',
+    tags=['Submenu'],
+    summary='Create submenu',
+    description='Create submenu with title and description',
+    response_description='Created submenu',
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseSubmenuModel
+    response_model=ResponseSubmenuModel,
 )
 async def create_submenu_handler(
         menu_id: int, submenu: SubmenuModel,
-        submenu_service: SubmenuService = Depends(get_submenu_service)
+        submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> ResponseSubmenuModel:
     return await submenu_service.create_submenu(menu_id=menu_id, submenu=submenu)
 
 
 @router.post(
-    '/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    path='/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    tags=['Dish'],
+    summary='Create dish',
+    description='Create dish with title, description and price',
+    response_description='Created dish',
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseDishModel
+    response_model=ResponseDishModel,
 )
 async def create_dish_handler(
         menu_id: int,
         submenu_id: int,
         dish: DishModel,
-        dish_service: DishService = Depends(get_dish_service)
+        dish_service: DishService = Depends(get_dish_service),
 ) -> ResponseDishModel:
     return await dish_service.create_dish(menu_id=menu_id, submenu_id=submenu_id, dish=dish)
 
 
 @router.get(
-    '/menus',
+    path='/menus',
+    tags=['Menu'],
+    summary='Get menus list',
+    description='Get menus list with title, description, submenus and dishes counters',
+    response_description='Menus list',
     status_code=status.HTTP_200_OK,
-    response_model=list[ResponseMenuModel]
+    response_model=list[ResponseMenuModel],
 )
 async def get_menus_list_handler(
-        menu_service: MenuService = Depends(get_menu_service)
+        menu_service: MenuService = Depends(get_menu_service),
 ) -> list[ResponseMenuModel]:
     return await menu_service.get_list()
 
 
 @router.get(
-    '/menus/{menu_id}',
+    path='/menus/{menu_id}',
+    tags=['Menu'],
+    summary='Get menu',
+    description='Get requested menu with title, description, submenus and dishes counters',
+    response_description='Requested menu',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseMenuModel
+    response_model=ResponseMenuModel,
 )
 async def get_menu_handler(
         menu_id: int,
-        menu_service: MenuService = Depends(get_menu_service)
+        menu_service: MenuService = Depends(get_menu_service),
 ) -> ResponseMenuModel:
     return await menu_service.get_menu(menu_id=menu_id)
 
 
 @router.get(
-    '/menus/{menu_id}/submenus',
+    path='/menus/{menu_id}/submenus',
+    tags=['Submenu'],
+    summary='Get submenus list',
+    description='Get submenu list with title, description and dishes counter',
+    response_description='Submenu list',
     status_code=status.HTTP_200_OK,
-    response_model=list[ResponseSubmenuModel]
+    response_model=list[ResponseSubmenuModel],
 )
 async def get_submenus_list_handler(
         menu_id: int,
-        submenu_service: SubmenuService = Depends(get_submenu_service)
+        submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> list[ResponseSubmenuModel]:
     return await submenu_service.get_list(menu_id)
 
 
 @router.get(
-    '/menus/{menu_id}/submenus/{submenu_id}',
+    path='/menus/{menu_id}/submenus/{submenu_id}',
+    tags=['Submenu'],
+    summary='Get submenu',
+    description='Get requested submenu with title, description and dishes counter',
+    response_description='Requested submenu',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseSubmenuModel)
+    response_model=ResponseSubmenuModel,
+)
 async def get_submenu_handler(
         menu_id: int,
         submenu_id: int,
-        submenu_service: SubmenuService = Depends(get_submenu_service)
+        submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> ResponseSubmenuModel:
     return await submenu_service.get_submenu(menu_id=menu_id, submenu_id=submenu_id)
 
 
 @router.get(
-    '/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    path='/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    tags=['Dish'],
+    summary='Get dishes list',
+    description='Get dishes list with title, description and price',
+    response_description='Dishes list',
     status_code=status.HTTP_200_OK,
-    response_model=list[ResponseDishModel]
+    response_model=list[ResponseDishModel],
 )
 async def get_dishes_list_handler(
         menu_id: int, submenu_id: int,
-        dish_service: DishService = Depends(get_dish_service)
+        dish_service: DishService = Depends(get_dish_service),
 ) -> list[ResponseDishModel]:
     return await dish_service.get_list(menu_id, submenu_id)
 
 
 @router.get(
-    '/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    path='/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    tags=['Dish'],
+    summary='Get dish',
+    description='Get requested dish with title, description and price',
+    response_description='Requested dish',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseDishModel
+    response_model=ResponseDishModel,
 )
 async def get_dish_handler(
         menu_id: int,
         submenu_id: int,
         dish_id: int,
-        dish_service: DishService = Depends(get_dish_service)
+        dish_service: DishService = Depends(get_dish_service),
 ) -> ResponseDishModel:
     return await dish_service.get_dish(menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id)
 
 
 @router.patch(
-    '/menus/{menu_id}',
+    path='/menus/{menu_id}',
+    tags=['Menu'],
+    summary='Update menu',
+    description='Update menu information: title and description',
+    response_description='Updated menu',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseMenuModel
+    response_model=ResponseMenuModel,
 )
 async def update_menu_handler(
         menu_id: int,
         menu_update: UpdateMenuModel,
-        menu_service: MenuService = Depends(get_menu_service)
+        menu_service: MenuService = Depends(get_menu_service),
 ) -> ResponseMenuModel:
     return await menu_service.update_menu(menu_update=menu_update, menu_id=menu_id)
 
 
 @router.patch(
-    '/menus/{menu_id}/submenus/{submenu_id}',
+    path='/menus/{menu_id}/submenus/{submenu_id}',
+    tags=['Submenu'],
+    summary='Update submenu',
+    description='Update submenu information: title and description',
+    response_description='Updated submenu',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseSubmenuModel
+    response_model=ResponseSubmenuModel,
 )
 async def update_submenu_handler(
         menu_id: int,
         submenu_id: int,
         submenu_update: UpdateSubmenuModel,
-        submenu_service: SubmenuService = Depends(get_submenu_service)
+        submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> ResponseSubmenuModel:
     return await submenu_service.update_submenu(menu_id=menu_id, submenu_id=submenu_id, submenu_update=submenu_update)
 
 
 @router.patch(
-    '/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    path='/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    tags=['Dish'],
+    summary='Update dish',
+    description='Update dish information: title, description and price',
+    response_description='Updated dish',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseDishModel
+    response_model=ResponseDishModel,
 )
 async def update_dish_handler(
         menu_id: int,
         submenu_id: int,
         dish_id: int,
         dish_update: UpdateDishModel,
-        dish_service: DishService = Depends(get_dish_service)
+        dish_service: DishService = Depends(get_dish_service),
 ) -> ResponseDishModel:
-    return await dish_service.update_dish(menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id,
-                                          dish_update=dish_update)
+    return await dish_service.update_dish(
+        menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id,
+        dish_update=dish_update,
+    )
 
 
 @router.delete(
-    '/menus/{menu_id}',
+    path='/menus/{menu_id}',
+    tags=['Menu'],
+    summary='Delete menu',
+    description='Delete requested menu with all submenus and dishes',
+    response_description='Deleted menu',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseMenuModel
+    response_model=ResponseMenuModel,
 )
 async def delete_menu_handler(
         menu_id: int,
-        menu_service: MenuService = Depends(get_menu_service)
+        menu_service: MenuService = Depends(get_menu_service),
 ) -> ResponseMenuModel:
     return await menu_service.delete_menu(menu_id=menu_id)
 
 
 @router.delete(
-    '/menus/{menu_id}/submenus/{submenu_id}',
+    path='/menus/{menu_id}/submenus/{submenu_id}',
+    tags=['Submenu'],
+    summary='Delete submenu',
+    description='Delete requested submenu with all dishes',
+    response_description='Deleted submenu',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseSubmenuModel
+    response_model=ResponseSubmenuModel,
 )
 async def delete_submenu_handler(
         menu_id: int,
         submenu_id: int,
-        submenu_service: SubmenuService = Depends(get_submenu_service)
+        submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> ResponseSubmenuModel:
     return await submenu_service.delete_submenu(menu_id=menu_id, submenu_id=submenu_id)
 
 
 @router.delete(
-    '/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    path='/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    tags=['Dish'],
+    summary='Delete dish',
+    description='Delete requested dish',
+    response_description='Deleted dish',
     status_code=status.HTTP_200_OK,
-    response_model=ResponseDishModel
+    response_model=ResponseDishModel,
 )
 async def delete_dish_handler(
         menu_id: int,
         submenu_id: int,
         dish_id: int,
-        dish_service: DishService = Depends(get_dish_service)
+        dish_service: DishService = Depends(get_dish_service),
 ) -> ResponseDishModel:
     return await dish_service.delete_dish(menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id)

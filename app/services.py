@@ -30,21 +30,27 @@ class Service:
     @staticmethod
     async def is_item_created(item) -> None:
         if not item:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail='Bad request',
+            )
 
     @staticmethod
     async def is_item_found(item, name: str) -> None:
         if not item:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{name} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f'{name} not found',
+            )
 
 
 class MenuService(Service):
     @staticmethod
     async def update_cache(menu_id: int) -> None:
-        await cache.delete_cache(names=(
-            'menus_list',
-            f'menu_{menu_id}',
-        ))
+        await cache.delete_cache(
+            names=(
+                'menus_list',
+                f'menu_{menu_id}',
+            ),
+        )
 
     async def create_menu(self, menu: MenuModel) -> ResponseMenuModel:
         new_menu = await crud.create_menu(db=self.db, menu=menu)
@@ -87,12 +93,14 @@ async def get_menu_service(db: Session = Depends(get_db)) -> MenuService:
 class SubmenuService(Service):
     @staticmethod
     async def update_cache(menu_id: int, submenu_id: int) -> None:
-        await cache.delete_cache(names=(
-            'menus_list',
-            f'menu_{menu_id}',
-            f'submenus_list_{menu_id}',
-            f'submenu_{menu_id}_{submenu_id}',
-        ))
+        await cache.delete_cache(
+            names=(
+                'menus_list',
+                f'menu_{menu_id}',
+                f'submenus_list_{menu_id}',
+                f'submenu_{menu_id}_{submenu_id}',
+            ),
+        )
 
     async def create_submenu(self, menu_id: int, submenu: SubmenuModel) -> ResponseSubmenuModel:
         new_submenu = await crud.create_submenu(db=self.db, menu_id=menu_id, submenu=submenu)
@@ -115,10 +123,18 @@ class SubmenuService(Service):
             await cache.set_cache(name=f'submenu_{menu_id}_{submenu_id}', value=submenu)
         return submenu
 
-    async def update_submenu(self, submenu_update: UpdateSubmenuModel, menu_id: int,
-                             submenu_id: int) -> ResponseSubmenuModel:
-        updated_submenu = await crud.update_submenu(db=self.db, submenu_update=submenu_update, menu_id=menu_id,
-                                                    submenu_id=submenu_id)
+    async def update_submenu(
+            self,
+            submenu_update: UpdateSubmenuModel,
+            menu_id: int,
+            submenu_id: int,
+    ) -> ResponseSubmenuModel:
+        updated_submenu = await crud.update_submenu(
+            db=self.db,
+            submenu_update=submenu_update,
+            menu_id=menu_id,
+            submenu_id=submenu_id,
+        )
         await self.is_item_found(updated_submenu, 'submenu')
         await self.update_cache(menu_id=menu_id, submenu_id=submenu_id)
         return updated_submenu
@@ -137,14 +153,16 @@ async def get_submenu_service(db: Session = Depends(get_db)) -> SubmenuService:
 class DishService(Service):
     @staticmethod
     async def update_cache(menu_id: int, submenu_id: int, dish_id: int) -> None:
-        await cache.delete_cache(names=(
-            'menus_list',
-            f'menu_{menu_id}',
-            f'submenus_list_{menu_id}',
-            f'submenu_{menu_id}_{submenu_id}',
-            f'dishes_list_{menu_id}_{submenu_id}',
-            f'dish_{menu_id}_{submenu_id}_{dish_id}',
-        ))
+        await cache.delete_cache(
+            names=(
+                'menus_list',
+                f'menu_{menu_id}',
+                f'submenus_list_{menu_id}',
+                f'submenu_{menu_id}_{submenu_id}',
+                f'dishes_list_{menu_id}_{submenu_id}',
+                f'dish_{menu_id}_{submenu_id}_{dish_id}',
+            ),
+        )
 
     async def create_dish(self, menu_id: int, submenu_id: int, dish: DishModel) -> ResponseDishModel:
         new_dish = await crud.create_dish(db=self.db, menu_id=menu_id, submenu_id=submenu_id, dish=dish)
@@ -167,10 +185,20 @@ class DishService(Service):
             await cache.set_cache(name=f'dish_{menu_id}_{submenu_id}_{dish_id}', value=dish)
         return dish
 
-    async def update_dish(self, dish_update: UpdateDishModel, menu_id: int,
-                          submenu_id: int, dish_id: int) -> ResponseDishModel:
-        updated_dish = await crud.update_dish(db=self.db, dish_update=dish_update, menu_id=menu_id,
-                                              submenu_id=submenu_id, dish_id=dish_id)
+    async def update_dish(
+            self,
+            dish_update: UpdateDishModel,
+            menu_id: int,
+            submenu_id: int,
+            dish_id: int,
+    ) -> ResponseDishModel:
+        updated_dish = await crud.update_dish(
+            db=self.db,
+            dish_update=dish_update,
+            menu_id=menu_id,
+            submenu_id=submenu_id,
+            dish_id=dish_id,
+        )
         await self.is_item_found(updated_dish, 'dish')
         await self.update_cache(menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id)
         return updated_dish

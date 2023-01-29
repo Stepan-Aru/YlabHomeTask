@@ -52,15 +52,15 @@ async def get_menus_list(db: Session) -> list[Menu]:
     query = db.query(
         Menu,
         func.count(distinct(Submenu.id)),
-        func.count(Dish.id)
+        func.count(Dish.id),
     ).join(
         Submenu,
         Menu.id == Submenu.menu_id,
-        isouter=True
+        isouter=True,
     ).join(
         Dish,
         Submenu.id == Dish.submenu_id,
-        isouter=True
+        isouter=True,
     ).group_by(Menu.id).all()
     return [await add_counters_in_menu(item) for item in query]
 
@@ -69,15 +69,15 @@ async def get_menu(db: Session, menu_id: int) -> Menu:
     query = db.query(
         Menu,
         func.count(distinct(Submenu.id)),
-        func.count(Dish.id)
+        func.count(Dish.id),
     ).join(
         Submenu,
         Menu.id == Submenu.menu_id,
-        isouter=True
+        isouter=True,
     ).join(
         Dish,
         Submenu.id == Dish.submenu_id,
-        isouter=True
+        isouter=True,
     ).filter(Menu.id == menu_id).group_by(Menu.id).first()
     return await add_counters_in_menu(query) if query else query
 
@@ -91,11 +91,11 @@ async def add_counter_in_submenu(item: tuple) -> Submenu:
 async def get_submenus_list(db: Session, menu_id: int) -> list[Submenu]:
     query = db.query(
         Submenu,
-        func.count(Dish.id)
+        func.count(Dish.id),
     ).join(
         Dish,
         Submenu.id == Dish.submenu_id,
-        isouter=True
+        isouter=True,
     ).filter(Submenu.menu_id == menu_id).group_by(Submenu.id).all()
     return [await add_counter_in_submenu(item) for item in query]
 
@@ -103,11 +103,11 @@ async def get_submenus_list(db: Session, menu_id: int) -> list[Submenu]:
 async def get_submenu(db: Session, menu_id: int, submenu_id: int) -> Submenu:
     query = db.query(
         Submenu,
-        func.count(Dish.id)
+        func.count(Dish.id),
     ).join(
         Dish,
         Submenu.id == Dish.submenu_id,
-        isouter=True
+        isouter=True,
     ).filter(Submenu.menu_id == menu_id, Submenu.id == submenu_id).group_by(Submenu.id).first()
     return await add_counter_in_submenu(query) if query else query
 
@@ -117,11 +117,18 @@ async def get_dishes_list(db: Session, menu_id: int, submenu_id: int) -> list[Di
 
 
 async def get_dish(db: Session, menu_id: int, submenu_id: int, dish_id: int) -> Dish:
-    return db.query(Dish).join(Submenu).filter(Submenu.id == submenu_id,
-                                               Submenu.menu_id == menu_id, Dish.id == dish_id).first()
+    return db.query(Dish).join(Submenu).filter(
+        Submenu.id == submenu_id,
+        Submenu.menu_id == menu_id,
+        Dish.id == dish_id,
+    ).first()
 
 
-async def update_menu(db: Session, menu_update: UpdateMenuModel, menu_id: int) -> Menu | None:
+async def update_menu(
+        db: Session,
+        menu_update: UpdateMenuModel,
+        menu_id: int,
+) -> Menu:
     menu = await get_menu(db, menu_id)
     menu.title = menu_update.title if menu_update.title else menu.title
     menu.description = menu_update.description if menu_update.description else menu.description
@@ -131,7 +138,11 @@ async def update_menu(db: Session, menu_update: UpdateMenuModel, menu_id: int) -
     return menu
 
 
-async def update_submenu(db: Session, submenu_update: UpdateSubmenuModel, menu_id: int, submenu_id: int) -> Submenu:
+async def update_submenu(
+        db: Session,
+        submenu_update: UpdateSubmenuModel,
+        menu_id: int, submenu_id: int,
+) -> Submenu:
     submenu = await get_submenu(db, menu_id, submenu_id)
     submenu.title = submenu_update.title if submenu_update.title else submenu.title
     submenu.description = submenu_update.description if submenu_update.description else submenu.description
@@ -141,8 +152,13 @@ async def update_submenu(db: Session, submenu_update: UpdateSubmenuModel, menu_i
     return submenu
 
 
-async def update_dish(db: Session, dish_update: UpdateDishModel, menu_id: int, submenu_id: int,
-                      dish_id: int) -> Dish:
+async def update_dish(
+        db: Session,
+        dish_update: UpdateDishModel,
+        menu_id: int,
+        submenu_id: int,
+        dish_id: int,
+) -> Dish:
     dish = await get_dish(db, menu_id, submenu_id, dish_id)
     dish.title = dish_update.title if dish_update.title else dish.title
     dish.description = dish_update.description if dish_update.description else dish.description

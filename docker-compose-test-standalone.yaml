@@ -34,7 +34,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - resto_network
+      - test_resto_network
 
 networks:
   test_resto_network:
