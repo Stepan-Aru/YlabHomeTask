@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
@@ -23,9 +21,12 @@ class DishModel(BaseDataModel):
     price: float
 
 
-class UpdateDataModel(BaseDataModel):
-    title: Optional[str]
-    description: Optional[str]
+class UpdateDataModel(BaseModel):
+    title: str | None
+    description: str | None
+
+    class Config:
+        orm_mode = True
 
 
 class UpdateMenuModel(UpdateDataModel):
@@ -37,7 +38,7 @@ class UpdateSubmenuModel(BaseDataModel):
 
 
 class UpdateDishModel(BaseDataModel):
-    price: Optional[float]
+    price: float | None
 
 
 class ResponseDataModel(BaseDataModel):
@@ -45,12 +46,12 @@ class ResponseDataModel(BaseDataModel):
 
 
 class ResponseMenuModel(ResponseDataModel):
-    submenus_count: Optional[int]
-    dishes_count: Optional[int]
+    submenus_count: int | None
+    dishes_count: int | None
 
 
 class ResponseSubmenuModel(ResponseDataModel):
-    dishes_count: Optional[int]
+    dishes_count: int | None
 
 
 class ResponseDishModel(ResponseDataModel):

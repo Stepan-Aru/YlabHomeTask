@@ -6,9 +6,9 @@ from app.routes import router
 app = FastAPI()
 
 
-@app.middleware('http')
+@app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
-    response = Response('Internal server error', status_code=500)
+    response = Response("Internal server error", status_code=500)
     try:
         request.state.db = SessionLocal()
         response = await call_next(request)
@@ -17,4 +17,4 @@ async def db_session_middleware(request: Request, call_next):
     return response
 
 
-app.include_router(router=router, prefix='/api/v1')
+app.include_router(router=router, prefix="/api/v1")
