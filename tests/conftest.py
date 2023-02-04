@@ -2,11 +2,11 @@ import asyncio
 import os
 from typing import Generator
 
-import psycopg2
+import asyncpg
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, session
 
 from app.database import Base
@@ -20,18 +20,17 @@ DB_NAME = os.environ.get('DB_NAME')
 
 
 def execute_db(command: str):
+    conn = None
     try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_URL,
+        conn = await asyncpg.connect(
+            database=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_URL,
         )
-        cursor = conn.cursor()
         conn.autocommit = True
-        cursor.execute(command)
+        await conn.execute(command)
     except Exception as ex:
         print(ex)
     finally:
-        cursor.close()
-        conn.close()
+        await conn.close()
 
 
 def create_test_db():
@@ -52,13 +51,18 @@ def kill_all_connections():
 
 
 def create_test_session_local():
-    TEST_DB_CONFIG = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_URL}/test_{DB_NAME}'
-    test_engine = create_engine(TEST_DB_CONFIG)
+    TEST_DB_CONFIG = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_URL}/test_{DB_NAME}'
+    test_engine = create_async_engine(TEST_DB_CONFIG, echo=True)
     TestSessionLocal = sessionmaker(
-        autocommit=False, autoflush=False, bind=test_engine,
+        autocommit=False,
+        autoflush=False,
+        bind=test_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
     )
 
     def override_get_db():
+        db = None
         try:
             db = TestSessionLocal()
             yield db

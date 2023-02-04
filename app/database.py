@@ -1,6 +1,7 @@
 import os
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, backref
 
 DB_USER = os.environ.get('DB_USER')
@@ -8,11 +9,17 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_URL = os.environ.get('DB_URL')
 DB_NAME = os.environ.get('DB_NAME')
 
-DB_CONFIG = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_URL}/{DB_NAME}'
+DB_CONFIG = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_URL}/{DB_NAME}'
 
-engine = create_engine(DB_CONFIG, echo=True)
+engine = create_async_engine(DB_CONFIG, echo=True)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 Base = declarative_base()
 
@@ -51,4 +58,5 @@ class Dish(BaseTable, Base):
 
 
 async def create_tables():
-    Base.metadata.create_all(engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

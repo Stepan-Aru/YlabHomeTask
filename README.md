@@ -27,11 +27,10 @@ docker-compose -f docker-compose-test.yaml up
 * Uvicorn
 * PosgresSQL
 * SQLAlchemy
-* Psycopgy2
+* Asyncpg
 * Redis
 * Docker, docker-compose
 
 ### План развития проекта:
 
 * Внедрить миграции БД (alembic)
-* Перейти на асинхронный драйвер БД
