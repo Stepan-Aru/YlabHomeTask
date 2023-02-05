@@ -29,8 +29,8 @@ docker-compose -f docker-compose-test.yaml up
 * SQLAlchemy
 * Asyncpg
 * Redis
+* Celery
+* Rabbitmq
+* Flower
 * Docker, docker-compose
-
-### План развития проекта:
-
-* Внедрить миграции БД (alembic)
+*

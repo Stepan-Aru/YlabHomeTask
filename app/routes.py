@@ -13,13 +13,16 @@ from app.models import (
     UpdateSubmenuModel,
 )
 from app.services import (
+    DataReportService,
     DishService,
     MenuService,
     SubmenuService,
+    get_data_report_service,
     get_dish_service,
     get_menu_service,
     get_submenu_service,
 )
+from app.test_data.add_test_data import add_test_data
 
 router = APIRouter()
 
@@ -295,3 +298,54 @@ async def delete_dish_handler(
     return await dish_service.delete_dish(
         menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id
     )
+
+
+@router.post(
+    path="/data_report/add_test_data",
+    tags=["Data report"],
+    summary="Add test data",
+    description="Add test data in database",
+    response_description="Test data added in database",
+    status_code=status.HTTP_201_CREATED,
+    response_model=str,
+)
+async def add_test_data_handler(
+    menu_service: MenuService = Depends(get_menu_service),
+    submenu_service: SubmenuService = Depends(get_submenu_service),
+    dishes_service: DishService = Depends(get_dish_service),
+) -> str:
+    return await add_test_data(
+        menu_service=menu_service,
+        submenu_service=submenu_service,
+        dishes_service=dishes_service,
+    )
+
+
+@router.post(
+    path="/data_report",
+    tags=["Data report"],
+    summary="Create data report",
+    description="Create a data report generation task",
+    response_description="Data report generation task created",
+    status_code=status.HTTP_201_CREATED,
+    response_model=dict,
+)
+async def create_data_report_handler(
+    data_report_service: DataReportService = Depends(get_data_report_service),
+) -> dict:
+    return await data_report_service.create_data_report()
+
+
+@router.get(
+    path="/data_report/{task_id}",
+    tags=["Data report"],
+    summary="Get data report",
+    description="Get result of data report generation task",
+    response_description="Result of data report generation task",
+    status_code=status.HTTP_200_OK,
+)
+async def get_data_report_handler(
+    task_id: str,
+    data_report_service: DataReportService = Depends(get_data_report_service),
+):
+    return await data_report_service.get_data_report(task_id=task_id)

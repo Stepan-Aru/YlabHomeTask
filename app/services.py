@@ -1,9 +1,13 @@
 from dataclasses import dataclass
 
+from celery.result import AsyncResult
 from fastapi import Depends, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import cache, crud
+from app.celery_worker.tasks import data_report_task
 from app.database import Dish, Menu, Submenu
 from app.models import (
     DishModel,
@@ -95,7 +99,7 @@ class MenuService(Service):
 
 
 async def get_menu_service(db: AsyncSession = Depends(get_db)) -> MenuService:
-    return MenuService(db)
+    return MenuService(db=db)
 
 
 class SubmenuService(Service):
@@ -166,7 +170,7 @@ class SubmenuService(Service):
 
 
 async def get_submenu_service(db: AsyncSession = Depends(get_db)) -> SubmenuService:
-    return SubmenuService(db)
+    return SubmenuService(db=db)
 
 
 class DishService(Service):
@@ -251,4 +255,38 @@ class DishService(Service):
 
 
 async def get_dish_service(db: AsyncSession = Depends(get_db)) -> DishService:
-    return DishService(db)
+    return DishService(db=db)
+
+
+@dataclass
+class DataReportService:
+    db: AsyncSession
+
+    async def create_data_report(self) -> dict:
+        data = await crud.get_all_data(db=self.db)
+        data = jsonable_encoder(data)
+        task = data_report_task.delay(data)
+        return {"task_id": task.id}
+
+    @staticmethod
+    async def get_data_report(task_id: str) -> dict | FileResponse:
+        task_result = AsyncResult(task_id)
+        if task_result.ready():
+            return FileResponse(
+                path=task_result.result["path"],
+                filename=task_result.result["file_name"],
+                media_type="multipart/form-data",
+            )
+        else:
+            return {
+                "task_id": task_id,
+                "task_status": task_result.status,
+            }
+
+
+async def get_data_report_service(
+    db: AsyncSession = Depends(get_db),
+) -> DataReportService:
+    return DataReportService(
+        db=db,
+    )

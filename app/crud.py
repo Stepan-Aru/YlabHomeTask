@@ -259,3 +259,20 @@ async def delete_dish(
     await db.delete(dish)
     await db.commit()
     return dish
+
+
+async def get_all_data(db: AsyncSession):  # add type hinting
+    result = await db.execute(
+        select(Menu, Submenu, Dish)
+        .join(
+            Submenu,
+            Menu.id == Submenu.menu_id,
+            isouter=True,
+        )
+        .join(
+            Dish,
+            Submenu.id == Dish.submenu_id,
+            isouter=True,
+        )
+    )
+    return result.all()
