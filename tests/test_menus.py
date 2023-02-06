@@ -71,8 +71,8 @@ async def test_menus_patch_menu(async_client: AsyncClient):
         "id": "1",
         "title": "My updated menu 1",
         "description": "My updated menu description 1",
-        "submenus_count": 0,
-        "dishes_count": 0,
+        "submenus_count": None,
+        "dishes_count": None,
     }
 
 
@@ -97,8 +97,8 @@ async def test_menus_delete_menu(async_client: AsyncClient):
         "id": "1",
         "title": "My updated menu 1",
         "description": "My updated menu description 1",
-        "submenus_count": 0,
-        "dishes_count": 0,
+        "submenus_count": None,
+        "dishes_count": None,
     }
 
 

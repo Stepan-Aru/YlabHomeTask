@@ -110,7 +110,7 @@ async def test_counters_delete_submenu(async_client: AsyncClient):
         "id": "1",
         "title": "My submenu 1",
         "description": "My submenu description 1",
-        "dishes_count": 2,
+        "dishes_count": None,
     }
 
 
@@ -149,8 +149,8 @@ async def test_counters_delete_menu(async_client: AsyncClient):
         "id": "1",
         "title": "My menu 1",
         "description": "My menu description 1",
-        "submenus_count": 0,
-        "dishes_count": 0,
+        "submenus_count": None,
+        "dishes_count": None,
     }
 
 

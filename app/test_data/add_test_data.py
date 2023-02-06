@@ -33,7 +33,7 @@ async def add_test_data(
                     }
                 )
                 new_submenu = await submenu_service.create_submenu(
-                    submenu=submenu, menu_id=new_menu.id
+                    submenu=submenu, menu_id=int(new_menu.id)
                 )
                 if new_submenu:
                     for dish_data in submenu_data["dishes"]:
@@ -46,7 +46,7 @@ async def add_test_data(
                         )
                         await dishes_service.create_dish(
                             dish=dish,
-                            menu_id=new_menu.id,
-                            submenu_id=new_submenu.id,
+                            menu_id=int(new_menu.id),
+                            submenu_id=int(new_submenu.id),
                         )
     return "Test data added successfully"

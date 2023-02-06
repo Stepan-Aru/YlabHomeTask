@@ -2,57 +2,59 @@ from pydantic import BaseModel
 
 
 class BaseDataModel(BaseModel):
-    title: str
-    description: str
-
     class Config:
         orm_mode = True
 
 
 class MenuModel(BaseDataModel):
-    pass
+    title: str
+    description: str
 
 
 class SubmenuModel(BaseDataModel):
-    pass
+    title: str
+    description: str
 
 
 class DishModel(BaseDataModel):
+    title: str
+    description: str
     price: float
 
 
-class UpdateDataModel(BaseModel):
+class UpdateMenuModel(BaseDataModel):
     title: str | None
     description: str | None
 
-    class Config:
-        orm_mode = True
-
-
-class UpdateMenuModel(UpdateDataModel):
-    pass
-
 
 class UpdateSubmenuModel(BaseDataModel):
-    pass
+    title: str | None
+    description: str | None
 
 
 class UpdateDishModel(BaseDataModel):
+    title: str | None
+    description: str | None
     price: float | None
 
 
-class ResponseDataModel(BaseDataModel):
+class ResponseMenuModel(BaseDataModel):
     id: str
-
-
-class ResponseMenuModel(ResponseDataModel):
+    title: str
+    description: str
     submenus_count: int | None
     dishes_count: int | None
 
 
-class ResponseSubmenuModel(ResponseDataModel):
+class ResponseSubmenuModel(BaseDataModel):
+    id: str
+    title: str
+    description: str
     dishes_count: int | None
 
 
-class ResponseDishModel(ResponseDataModel):
+class ResponseDishModel(BaseDataModel):
+    id: str
+    title: str
+    description: str
     price: str

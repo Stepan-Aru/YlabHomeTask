@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import FileResponse
 
-from app.database import Dish, Menu, Submenu, create_tables
+from app.database import create_tables
 from app.models import (
     DishModel,
     MenuModel,
@@ -44,7 +45,7 @@ async def startup():
 async def create_menu_handler(
     menu: MenuModel,
     menu_service: MenuService = Depends(get_menu_service),
-) -> Menu | None:
+) -> ResponseMenuModel | None:
     return await menu_service.create_menu(menu=menu)
 
 
@@ -61,7 +62,7 @@ async def create_submenu_handler(
     menu_id: int,
     submenu: SubmenuModel,
     submenu_service: SubmenuService = Depends(get_submenu_service),
-) -> Submenu | None:
+) -> ResponseSubmenuModel | None:
     return await submenu_service.create_submenu(menu_id=menu_id, submenu=submenu)
 
 
@@ -79,7 +80,7 @@ async def create_dish_handler(
     submenu_id: int,
     dish: DishModel,
     dish_service: DishService = Depends(get_dish_service),
-) -> Dish | None:
+) -> ResponseDishModel | None:
     return await dish_service.create_dish(
         menu_id=menu_id, submenu_id=submenu_id, dish=dish
     )
@@ -199,7 +200,7 @@ async def update_menu_handler(
     menu_id: int,
     menu_update: UpdateMenuModel,
     menu_service: MenuService = Depends(get_menu_service),
-) -> Menu | None:
+) -> ResponseMenuModel | None:
     return await menu_service.update_menu(menu_update=menu_update, menu_id=menu_id)
 
 
@@ -217,7 +218,7 @@ async def update_submenu_handler(
     submenu_id: int,
     submenu_update: UpdateSubmenuModel,
     submenu_service: SubmenuService = Depends(get_submenu_service),
-) -> Submenu | None:
+) -> ResponseSubmenuModel | None:
     return await submenu_service.update_submenu(
         menu_id=menu_id, submenu_id=submenu_id, submenu_update=submenu_update
     )
@@ -238,7 +239,7 @@ async def update_dish_handler(
     dish_id: int,
     dish_update: UpdateDishModel,
     dish_service: DishService = Depends(get_dish_service),
-) -> Dish | None:
+) -> ResponseDishModel | None:
     return await dish_service.update_dish(
         menu_id=menu_id,
         submenu_id=submenu_id,
@@ -259,7 +260,7 @@ async def update_dish_handler(
 async def delete_menu_handler(
     menu_id: int,
     menu_service: MenuService = Depends(get_menu_service),
-) -> ResponseMenuModel:
+) -> ResponseMenuModel | None:
     return await menu_service.delete_menu(menu_id=menu_id)
 
 
@@ -276,7 +277,7 @@ async def delete_submenu_handler(
     menu_id: int,
     submenu_id: int,
     submenu_service: SubmenuService = Depends(get_submenu_service),
-) -> ResponseSubmenuModel:
+) -> ResponseSubmenuModel | None:
     return await submenu_service.delete_submenu(menu_id=menu_id, submenu_id=submenu_id)
 
 
@@ -294,7 +295,7 @@ async def delete_dish_handler(
     submenu_id: int,
     dish_id: int,
     dish_service: DishService = Depends(get_dish_service),
-) -> ResponseDishModel:
+) -> ResponseDishModel | None:
     return await dish_service.delete_dish(
         menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id
     )
@@ -327,7 +328,7 @@ async def add_test_data_handler(
     summary="Create data report",
     description="Create a data report generation task",
     response_description="Data report generation task created",
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_202_ACCEPTED,
     response_model=dict,
 )
 async def create_data_report_handler(
@@ -343,9 +344,10 @@ async def create_data_report_handler(
     description="Get result of data report generation task",
     response_description="Result of data report generation task",
     status_code=status.HTTP_200_OK,
+    response_model=None,
 )
 async def get_data_report_handler(
     task_id: str,
     data_report_service: DataReportService = Depends(get_data_report_service),
-):
+) -> FileResponse | dict:
     return await data_report_service.get_data_report(task_id=task_id)

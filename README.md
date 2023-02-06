@@ -33,4 +33,3 @@ docker-compose -f docker-compose-test.yaml up
 * Rabbitmq
 * Flower
 * Docker, docker-compose
-*

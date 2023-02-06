@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import cache, crud
 from app.celery_worker.tasks import data_report_task
-from app.database import Dish, Menu, Submenu
 from app.models import (
     DishModel,
     MenuModel,
@@ -51,7 +50,7 @@ class Service:
 
 class MenuService(Service):
     @staticmethod
-    async def update_cache(menu_id: int) -> None:
+    async def update_cache(menu_id: int | None = None) -> None:
         await cache.delete_cache(
             names=(
                 "menus_list",
@@ -59,10 +58,10 @@ class MenuService(Service):
             ),
         )
 
-    async def create_menu(self, menu: MenuModel) -> Menu | None:
+    async def create_menu(self, menu: MenuModel) -> ResponseMenuModel | None:
         new_menu = await crud.create_menu(db=self.db, menu=menu)
         if await self.is_item_created(new_menu):
-            await self.update_cache(menu_id=new_menu.id)
+            await self.update_cache()
             return new_menu
         return None
 
@@ -83,7 +82,7 @@ class MenuService(Service):
 
     async def update_menu(
         self, menu_update: UpdateMenuModel, menu_id: int
-    ) -> Menu | None:
+    ) -> ResponseMenuModel | None:
         updated_menu = await crud.update_menu(
             db=self.db, menu_update=menu_update, menu_id=menu_id
         )
@@ -91,7 +90,7 @@ class MenuService(Service):
         await self.update_cache(menu_id=menu_id)
         return updated_menu
 
-    async def delete_menu(self, menu_id: int) -> ResponseMenuModel:
+    async def delete_menu(self, menu_id: int) -> ResponseMenuModel | None:
         menu = await crud.delete_menu(db=self.db, menu_id=menu_id)
         await self.is_item_found(menu, "menu")
         await self.update_cache(menu_id=menu_id)
@@ -116,7 +115,7 @@ class SubmenuService(Service):
 
     async def create_submenu(
         self, menu_id: int, submenu: SubmenuModel
-    ) -> Submenu | None:
+    ) -> ResponseSubmenuModel | None:
         new_submenu = await crud.create_submenu(
             db=self.db, menu_id=menu_id, submenu=submenu
         )
@@ -147,7 +146,7 @@ class SubmenuService(Service):
         submenu_update: UpdateSubmenuModel,
         menu_id: int,
         submenu_id: int,
-    ) -> Submenu | None:
+    ) -> ResponseSubmenuModel | None:
         updated_submenu = await crud.update_submenu(
             db=self.db,
             submenu_update=submenu_update,
@@ -160,7 +159,7 @@ class SubmenuService(Service):
 
     async def delete_submenu(
         self, menu_id: int, submenu_id: int
-    ) -> ResponseSubmenuModel:
+    ) -> ResponseSubmenuModel | None:
         submenu = await crud.delete_submenu(
             db=self.db, menu_id=menu_id, submenu_id=submenu_id
         )
@@ -191,7 +190,7 @@ class DishService(Service):
 
     async def create_dish(
         self, menu_id: int, submenu_id: int, dish: DishModel
-    ) -> Dish | None:
+    ) -> ResponseDishModel | None:
         new_dish = await crud.create_dish(
             db=self.db, menu_id=menu_id, submenu_id=submenu_id, dish=dish
         )
@@ -231,7 +230,7 @@ class DishService(Service):
         menu_id: int,
         submenu_id: int,
         dish_id: int,
-    ) -> Dish | None:
+    ) -> ResponseDishModel | None:
         updated_dish = await crud.update_dish(
             db=self.db,
             dish_update=dish_update,
@@ -245,7 +244,7 @@ class DishService(Service):
 
     async def delete_dish(
         self, menu_id: int, submenu_id: int, dish_id: int
-    ) -> ResponseDishModel:
+    ) -> ResponseDishModel | None:
         dish = await crud.delete_dish(
             db=self.db, menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id
         )
@@ -269,7 +268,7 @@ class DataReportService:
         return {"task_id": task.id}
 
     @staticmethod
-    async def get_data_report(task_id: str) -> dict | FileResponse:
+    async def get_data_report(task_id: str) -> FileResponse | dict:
         task_result = AsyncResult(task_id)
         if task_result.ready():
             return FileResponse(
